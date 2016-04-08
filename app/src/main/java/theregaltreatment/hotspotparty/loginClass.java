@@ -9,9 +9,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 
+
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.TextView;
+
+import theregaltreatment.hotspotparty.model.*;
+import theregaltreatment.hotspotparty.helper.*;
+
 
 public class loginClass  extends AsyncTask<String,Void,String>{
     private TextView statusField,roleField;
@@ -33,7 +39,6 @@ public class loginClass  extends AsyncTask<String,Void,String>{
     @Override
     protected String doInBackground(String... arg0) {
         if(byGetOrPost == 0){ //means by Get Method
-
             try{
                 String username = (String)arg0[0];
                 String password = (String)arg0[1];
