@@ -26,9 +26,16 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A login screen that offers login via email/password.
@@ -340,42 +347,112 @@ TODO: Move this to register area to see if email is a valid email address
         return password.length() > 8;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
+
+    /** Begin httpUrlConn class
+     * The start for the class that will handle our user input
      */
-/*    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+    public class httpUrlConn extends AsyncTask<Void, Void, Boolean> {
+
+        private HashMap<String,String> map = null;
+        private String url;
+
+        private final String USER_AGENT = "Mozilla/5.0";
+
+        /* public void main(String[] args) throws Exception {
+
+             HttpURLConnectionExample http = new HttpURLConnectionExample();
+
+            Log.i ("Testing", "SUCCESS");
+             http.sendPost();
+
+         }*/
+        public httpUrlConn() {
+        }
+
+        public httpUrlConn(HashMap<String,String> _map, String _url) {
+            map = _map;
+            url = _url;
+        }
+
+
+        // HTTP POST request
+        public void sendPost() throws Exception {
+
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            //add reuqest header
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+            String params ="";
+
+            // key=value&key=value
+
+            Iterator it = map.entrySet().iterator();
+            int size = map.size();
+            int i =0;
+            while(it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                if(size>1)
+                    params += pair.getKey() + "=" + pair.getValue() + "&";
+                else
+                    params += pair.getKey() + "=" + pair.getValue();
+                size--;
+            }
+
+
+
+            // Send post request
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(params);
+            wr.flush();
+            wr.close();
+
+            int responseCode = con.getResponseCode();
+            Log.i("Request to URL : ", url);
+            Log.i("Post parameters : ", params);
+            Log.i("Response Code : ", Integer.valueOf(responseCode).toString());
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            //print result
+            Log.i(response.toString(), "SUCCESS");
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                sendPost();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success){
+            mAuthTask = null;
         }
     }
-*/
+
+
+    /** Begin class to store user credentials in phone
+     */
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
@@ -440,12 +517,54 @@ TODO: Move this to register area to see if email is a valid email address
         int IS_PRIMARY = 1;
     }
 
-    public class test extends httpUrlConn {
 
-        public void onPostExecute () {
-            mAuthTask = null;
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+/*    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
+*/
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
