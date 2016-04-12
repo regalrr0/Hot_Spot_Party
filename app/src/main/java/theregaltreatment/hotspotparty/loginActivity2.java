@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -41,6 +42,8 @@ import java.util.Map;
  * A login screen that offers login via email/password.
  */
 public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks<Cursor>, OnItemSelectedListener {
+
+    private String response;
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -316,11 +319,19 @@ TODO: Move this to register area to see if email is a valid email address
             //reset = (test) mAuthTask;
 
             mAuthTask.execute();
+            // if php inserted credentials into the database
+           if(response.contains("true")) {
+                Log.i("response","dsfdsf means we inserted shit");
+                Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+            }
+            else {
+                String[] resp = response.split(",");
+                for(String i: resp)
+                    Toast.makeText(getApplicationContext(),i,Toast.LENGTH_LONG).show();
+            }
 
             if(mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
                 mAuthTask = null;
-
-            //reset.onPostExecute();
         }
     }
 
@@ -344,30 +355,21 @@ TODO: Move this to register area to see if email is a valid email address
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 8;
+        return password.length() > 1;
     }
 
 
-    /** Begin httpUrlConn class
+    /** Begin class
      * The start for the class that will handle our user input
      */
+    //------------------------------------------------------------------------------------------
 
-
-    public class httpUrlConn extends AsyncTask<Void, Void, Boolean> {
+    public class httpUrlConn extends AsyncTask<Void, Void, String> {
 
         private HashMap<String,String> map = null;
         private String url;
-
         private final String USER_AGENT = "Mozilla/5.0";
 
-        /* public void main(String[] args) throws Exception {
-
-             HttpURLConnectionExample http = new HttpURLConnectionExample();
-
-            Log.i ("Testing", "SUCCESS");
-             http.sendPost();
-
-         }*/
         public httpUrlConn() {
         }
 
@@ -376,9 +378,8 @@ TODO: Move this to register area to see if email is a valid email address
             url = _url;
         }
 
-
         // HTTP POST request
-        public void sendPost() throws Exception {
+        public String sendPost() throws Exception {
 
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -392,9 +393,9 @@ TODO: Move this to register area to see if email is a valid email address
 
             // key=value&key=value
 
+            // make the url params that will be sent
             Iterator it = map.entrySet().iterator();
             int size = map.size();
-            int i =0;
             while(it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 if(size>1)
@@ -403,9 +404,6 @@ TODO: Move this to register area to see if email is a valid email address
                     params += pair.getKey() + "=" + pair.getValue();
                 size--;
             }
-
-
-
             // Send post request
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -418,36 +416,37 @@ TODO: Move this to register area to see if email is a valid email address
             Log.i("Post parameters : ", params);
             Log.i("Response Code : ", Integer.valueOf(responseCode).toString());
 
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String inputLine;
-            StringBuffer response = new StringBuffer();
+            StringBuffer r = new StringBuffer();
 
             while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                r.append(inputLine);
             }
             in.close();
 
-            //print result
-            Log.i(response.toString(), "SUCCESS");
+            // store the result in the instance variable response
+            return r.toString();
 
         }
-
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             try {
-                sendPost();
+                response = sendPost();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return null;
+            return response;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success){
+        protected void onPostExecute(final String success){
+            response = success;
             mAuthTask = null;
         }
     }
+
+    //-------------------------------------------------------------------------------------------
 
 
     /** Begin class to store user credentials in phone
