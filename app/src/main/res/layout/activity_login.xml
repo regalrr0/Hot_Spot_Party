@@ -64,6 +64,14 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/last_name"
+        android:hint="Last Name"
+        android:minHeight="43dp"
+        android:visibility="invisible" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:inputType="number"
         android:ems="10"
         android:id="@+id/Age"
@@ -89,17 +97,17 @@
         android:layout_marginTop="16dp"
         android:text="Sign in"
         android:textStyle="bold"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:minHeight="10dp" />
 
     <Button
         style="?android:textAppearanceSmall"
         android:id="@+id/register_button"
         android:layout_width="149dp"
-        android:layout_height="wrap_content"
+        android:layout_height="63dp"
         android:layout_marginTop="16dp"
         android:text="Not Registered? Click Here"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal" />
+        android:textStyle="bold" />
 
     <Button
         android:layout_width="119dp"

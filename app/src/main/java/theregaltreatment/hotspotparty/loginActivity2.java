@@ -1,28 +1,9 @@
 package theregaltreatment.hotspotparty;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
-
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -30,9 +11,7 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
@@ -42,36 +21,19 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-
-import javax.net.ssl.HttpsURLConnection;
-
-import static android.Manifest.permission.INTERNET;
-import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks<Cursor>, OnItemSelectedListener {
-
-
-    //HttpURLConnectionExample httpconn;
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -88,11 +50,14 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private HttpURLConnectionExample mAuthTask = null;
+
+    httpUrlConn mAuthTask = null;
+
+    //test reset;
 
     // UI references.
     private TextView mEmailView;
-    private EditText mPasswordView, cPassword, usernameView, fname, age;
+    private EditText mPasswordView, cPassword, usernameView, fname, age, lname;
     private View mProgressView;
     private View mLoginFormView;
     private Spinner spinner;
@@ -106,6 +71,8 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
         // Set up the login form.
         mEmailView = (TextView) findViewById(R.id.email);
         //populateAutoComplete();
+
+        lname = (EditText) findViewById(R.id.last_name);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -160,16 +127,21 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
         //mLoginFormView = findViewById(R.id.login_form);
 
         spinner = (Spinner) findViewById(R.id.spinner);
-// Create an ArrayAdapter using the string array and a default spinner layout
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.gender_array, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
+
+        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
+
+        // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
 
 
     }
+
+    // TODO: Possibly use this in the final version for autocompletion
 /*
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -242,9 +214,10 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
             focusView = mPasswordView;
             cancel = true;
         }
-
-        // Check for a valid email address.
-        /*if (TextUtils.isEmpty(email)) {
+/*
+TODO: Move this to register area to see if email is a valid email address
+       // Check for a valid email address.
+        if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
@@ -252,7 +225,8 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
-        }*/
+        }
+        */
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -262,13 +236,85 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //showProgress(true);
-            mAuthTask = new HttpURLConnectionExample(username, password);
+            HashMap<String,String> map = new HashMap<>();
+            map.put("username",username);
+            map.put("pass",password);
+            mAuthTask = new httpUrlConn(map,"http://hive.sewanee.edu/evansdb0/android/hotPartyLogin.php");
+
             mAuthTask.execute();
+
+            if(mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
+                mAuthTask = null;
+
+            //reset.onPostExecute();
         }
     }
 
-    public void signUp() {
 
+    // TODO: Add new user to database
+    public void signUp() {
+        if (mAuthTask != null) {
+            return;
+        }
+
+        // Reset errors.
+        mPasswordView.setError(null);
+        usernameView.setError(null);
+        lname.setError(null);
+        mEmailView.setError(null);
+        cPassword.setError(null);
+        age.setError(null);
+        fname.setError(null);
+
+        // Store values at the time of the login attempt.
+        String username = usernameView.getText().toString();
+        String password = mPasswordView.getText().toString();
+        String email = mEmailView.getText().toString();
+        String lnameS = lname.getText().toString();
+        String fnameS = fname.getText().toString();
+        String conPass = cPassword.getText().toString();
+        String ageS = age.getText().toString();
+        String gender = spinner.getSelectedItem().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+        // Check for a valid password, if the user entered one.
+        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+            mPasswordView.setError(getString(R.string.error_invalid_password));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
+            //showProgress(true);
+            HashMap<String, String> map = new HashMap<>();
+            map.put("userName", username);
+            map.put("pass", password);
+            map.put("age", ageS);
+            map.put("email", email);
+            map.put("fName", fnameS);
+            map.put("lName", lnameS);
+            map.put("sex", gender);
+            map.put("cPass", conPass);
+
+            mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android/hotPartySignUp.php");
+
+            //reset = (test) mAuthTask;
+
+            mAuthTask.execute();
+
+            if(mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
+                mAuthTask = null;
+
+            //reset.onPostExecute();
+        }
     }
 
     public void register() {
@@ -279,7 +325,7 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
         spinner.setVisibility(View.VISIBLE);
         signUpButton.setVisibility(View.VISIBLE);
         mEmailView.setVisibility(View.VISIBLE);
-
+        lname.setVisibility(View.VISIBLE);
         mEmailSignInButton.setVisibility(View.INVISIBLE);
         registerButton.setVisibility(View.INVISIBLE);
     }
@@ -291,7 +337,7 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 8;
     }
 
     /**
@@ -394,6 +440,13 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
         int IS_PRIMARY = 1;
     }
 
+    public class test extends httpUrlConn {
+
+        public void onPostExecute () {
+            mAuthTask = null;
+        }
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -458,135 +511,4 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
             //showProgress(false);
         }
     }*/
-
-    public class HttpURLConnectionExample extends AsyncTask<Void, Void, Boolean> {
-
-        private String[] urlParams;
-
-        private final String USER_AGENT = "Mozilla/5.0";
-
-       /* public void main(String[] args) throws Exception {
-
-            HttpURLConnectionExample http = new HttpURLConnectionExample();
-
-           Log.i ("Testing", "SUCCESS");
-            http.sendPost();
-
-        }*/
-
-        public HttpURLConnectionExample(String... urlParam) {
-            urlParams = urlParam;
-        }
-
-        // HTTP GET request
-        private void sendGet() throws Exception {
-
-            String url = "http://hive.sewanee.edu/evansdb0/test/hotPartySignUp.php";
-
-            URL obj = new URL(url);
-
-            String urlParameters = "username=evansdb0&pass=iamtheshit";
-            byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
-            int postDataLength = postData.length;
-
-
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-            // optional default is GET
-            con.setRequestMethod("POST");
-
-            //add request header
-            con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setDoOutput(true);
-            try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
-                wr.write(postData);
-            }
-
-            Thread.sleep(2);
-
-            int responseCode = con.getResponseCode();
-            System.out.println("\nSending 'GET' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            //print result
-            System.out.println(response.toString());
-
-        }
-
-        // HTTP POST request
-        private void sendPost() throws Exception {
-
-            String url = "http://hive.sewanee.edu/evansdb0/test/hotPartySignUp.php";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-            //add reuqest header
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-            String urlParameters = "username=" + urlParams[0] + "&pass=" + urlParams[1];
-
-            // Send post request
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-
-            int responseCode = con.getResponseCode();
-            Log.i("Request to URL : ", url);
-            Log.i("Post parameters : ", urlParameters);
-            Log.i("Response Code : ", Integer.valueOf(responseCode).toString());
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            //print result
-            Log.i(response.toString(), "SUCCESS");
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                sendPost();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            //showProgress(false);
-
-            /*if (success) {
-                Intent i = new Intent(getApplicationContext(), home.class);
-                //i.putExtra("USERNAME", user.getusername());
-                startActivity(i);
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }*/
-        }
-    }
 }

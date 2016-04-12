@@ -15,9 +15,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.TextView;
 
-import theregaltreatment.hotspotparty.model.*;
-import theregaltreatment.hotspotparty.helper.*;
-
 
 public class loginClass  extends AsyncTask<String,Void,String>{
     private TextView statusField,roleField;
