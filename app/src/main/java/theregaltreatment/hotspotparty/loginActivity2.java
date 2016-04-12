@@ -43,7 +43,7 @@ import java.util.Map;
  */
 public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks<Cursor>, OnItemSelectedListener {
 
-    private String response;
+    protected String response;
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -426,6 +426,8 @@ TODO: Move this to register area to see if email is a valid email address
             in.close();
 
             // store the result in the instance variable response
+
+            Log.i("Send Post:", r.toString());
             return r.toString();
 
         }
@@ -436,12 +438,14 @@ TODO: Move this to register area to see if email is a valid email address
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Log.i("Response is:", response);
             return response;
         }
 
         @Override
         protected void onPostExecute(final String success){
-            response = success;
+            //response = success;
+            Log.i("Response for OPE is", response);
             mAuthTask = null;
         }
     }
