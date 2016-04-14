@@ -1,5 +1,6 @@
 package theregaltreatment.hotspotparty;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A login screen that offers login via email/password.
@@ -45,25 +47,18 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
 
     protected String response;
 
+    Boolean registering = false;
+
     /**
      * Id to identity READ_CONTACTS permission request.
      */
-    private static final int REQUEST_READ_CONTACTS = 0;
+    //private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
 
     httpUrlConn mAuthTask = null;
-
-    //test reset;
 
     // UI references.
     private TextView mEmailView;
@@ -71,7 +66,7 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
     private View mProgressView;
     private View mLoginFormView;
     private Spinner spinner;
-    private Button mEmailSignInButton, registerButton, signUpButton;
+    private Button mEmailSignInButton, registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,25 +97,28 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
         fname = (EditText) findViewById(R.id.first_name);
         age = (EditText) findViewById(R.id.Age);
 
-        // button that will appear to sign the new user up
-        signUpButton = (Button) findViewById(R.id.sign_up);
-        signUpButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signUp();
-            }
-        });
 
         // button that logs in existing users
         mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    attemptLogin();
-                } catch (Exception e) {
-                    Log.i("FAIL", "We are here");
-                    e.printStackTrace();
+                if (!registering) {
+                    try {
+                        attemptLogin();
+                    } catch (Exception e) {
+                        Log.i("FAIL", "We are here");
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    try {
+                        signUp();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -133,8 +131,6 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
                 register();
             }
         });
-
-        //mLoginFormView = findViewById(R.id.login_form);
 
         spinner = (Spinner) findViewById(R.id.spinner);
 
@@ -151,51 +147,7 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
 
     }
 
-    // TODO: Possibly use this in the final version for autocompletion
-/*
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
 
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
-    }
-*/
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -246,23 +198,43 @@ TODO: Move this to register area to see if email is a valid email address
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //showProgress(true);
-            HashMap<String,String> map = new HashMap<>();
-            map.put("username",username);
-            map.put("pass",password);
-            mAuthTask = new httpUrlConn(map,"http://hive.sewanee.edu/evansdb0/android/hotPartyLogin.php");
+            HashMap<String, String> map = new HashMap<>();
+            map.put("username", username);
+            map.put("pass", password);
+            mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android/hotPartyLogin.php");
 
             mAuthTask.execute();
 
-            if(mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
-                mAuthTask = null;
+            try {
+                if(mAuthTask.get().contains("true")) {
+                    String r = mAuthTask.get().replace("true,","");
+                    Log.i("response", "dsfdsf means we got dis shit");
+                    Toast.makeText(getApplicationContext(),r,Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(this, getEvents2.class);
+                    i.putExtra("username", username);
+                    startActivity(i);
 
-            //reset.onPostExecute();
+                }
+                else {
+                    String[] resp = response.split(",");
+                    for(String i: resp)
+                        Toast.makeText(getApplicationContext(),i,Toast.LENGTH_LONG).show();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            if (mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED)) {
+                mAuthTask = null;
+            }
         }
     }
 
 
     // TODO: Add new user to database
-    public void signUp() {
+    public void signUp() throws ExecutionException, InterruptedException {
         if (mAuthTask != null) {
             return;
         }
@@ -316,18 +288,27 @@ TODO: Move this to register area to see if email is a valid email address
 
             mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android/hotPartySignUp.php");
 
-            //reset = (test) mAuthTask;
-
             mAuthTask.execute();
             // if php inserted credentials into the database
-           if(response.contains("true")) {
-                Log.i("response","dsfdsf means we inserted shit");
-                Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
-            }
-            else {
-                String[] resp = response.split(",");
-                for(String i: resp)
-                    Toast.makeText(getApplicationContext(),i,Toast.LENGTH_LONG).show();
+            Log.i("mAuthTask.get is:", mAuthTask.get());
+            try {
+                if(mAuthTask.get().contains("true")) {
+                     String r = mAuthTask.get().replace("true,","");
+                     Log.i("response", "dsfdsf means we inserted shit");
+                     Toast.makeText(getApplicationContext(),r,Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(this, getEvents2.class);
+                    startActivity(i);
+
+                 }
+                 else {
+                     String[] resp = response.split(",");
+                     for(String i: resp)
+                         Toast.makeText(getApplicationContext(),i,Toast.LENGTH_LONG).show();
+                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
 
             if(mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
@@ -336,16 +317,30 @@ TODO: Move this to register area to see if email is a valid email address
     }
 
     public void register() {
-        cPassword.setVisibility(View.VISIBLE);
-        fname.setVisibility(View.VISIBLE);
-        usernameView.setVisibility(View.VISIBLE);
-        age.setVisibility(View.VISIBLE);
-        spinner.setVisibility(View.VISIBLE);
-        signUpButton.setVisibility(View.VISIBLE);
-        mEmailView.setVisibility(View.VISIBLE);
-        lname.setVisibility(View.VISIBLE);
-        mEmailSignInButton.setVisibility(View.INVISIBLE);
-        registerButton.setVisibility(View.INVISIBLE);
+        if(!registering) {
+            registerButton.setText("Back to Sign-in");
+            cPassword.setVisibility(View.VISIBLE);
+            fname.setVisibility(View.VISIBLE);
+            usernameView.setVisibility(View.VISIBLE);
+            age.setVisibility(View.VISIBLE);
+            spinner.setVisibility(View.VISIBLE);
+            mEmailView.setVisibility(View.VISIBLE);
+            lname.setVisibility(View.VISIBLE);
+            registering = true;
+        }
+        else{
+            registerButton.setText("Not Registered?");
+            cPassword.setVisibility(View.INVISIBLE);
+            fname.setVisibility(View.INVISIBLE);
+            usernameView.setVisibility(View.VISIBLE);
+            age.setVisibility(View.INVISIBLE);
+            spinner.setVisibility(View.INVISIBLE);
+            mEmailView.setVisibility(View.INVISIBLE);
+            lname.setVisibility(View.INVISIBLE);
+            mEmailSignInButton.setVisibility(View.VISIBLE);
+            registering = false;
+        }
+        //registerButton.setVisibility(View.INVISIBLE);
     }
 
     private boolean isEmailValid(String email) {
@@ -355,7 +350,7 @@ TODO: Move this to register area to see if email is a valid email address
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 1;
+        return password.length() > 0;
     }
 
 
@@ -450,6 +445,13 @@ TODO: Move this to register area to see if email is a valid email address
         }
     }
 
+
+
+
+
+
+
+
     //-------------------------------------------------------------------------------------------
 
 
@@ -526,7 +528,51 @@ TODO: Move this to register area to see if email is a valid email address
 
 
 
+    // TODO: Possibly use this in the final version for autocompletion
+/*
+    private void populateAutoComplete() {
+        if (!mayRequestContacts()) {
+            return;
+        }
 
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    private boolean mayRequestContacts() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
+            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+                        }
+                    });
+        } else {
+            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+        }
+        return false;
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_READ_CONTACTS) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                populateAutoComplete();
+            }
+        }
+    }
+*/
 
 
 
@@ -568,69 +614,4 @@ TODO: Move this to register area to see if email is a valid email address
         }
     }
 */
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    /*public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mUser;
-        private final String mPassword;
-
-        UserLoginTask(String userl, String password, String email) {
-            mEmail = email;
-            mUser = userl;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            //showProgress(false);
-
-            if (success) {
-                /*Intent i = new Intent(getApplicationContext(), home.class);
-                i.putExtra("USERNAME", user.getusername());
-                startActivity(i);
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            finish();
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            //showProgress(false);
-        }
-    }*/
 }

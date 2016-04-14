@@ -11,6 +11,19 @@
     tools:context="theregaltreatment.hotspotparty.LoginActivity">
 
     <!-- Login progress -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView2"
+        android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+
 
     <EditText
         android:layout_width="match_parent"
@@ -90,32 +103,29 @@
         android:focusable="false"
         android:visibility="invisible" />
 
-    <Button
+        <Button
         android:id="@+id/email_sign_in_button"
         style="?android:textAppearanceSmall"
         android:layout_width="145dp"
-        android:layout_height="wrap_content"
+        android:layout_height="61dp"
         android:layout_marginTop="16dp"
         android:text="Sign in"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
         android:minHeight="10dp" />
 
-    <Button
-        style="?android:textAppearanceSmall"
-        android:id="@+id/register_button"
-        android:layout_width="149dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="16dp"
-        android:text="Not Registered? Click Here"
-        android:textStyle="bold" />
+        <Button
+            style="?android:textAppearanceSmall"
+            android:id="@+id/register_button"
+            android:layout_width="149dp"
+            android:layout_height="63dp"
+            android:layout_marginTop="16dp"
+            android:text="Not Registered?"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal" />
 
-    <Button
-        android:layout_width="119dp"
-        android:layout_height="wrap_content"
-        android:text="Sign Up"
-        android:id="@+id/sign_up"
-        android:layout_gravity="center_horizontal"
-        android:visibility="invisible" />
+    </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>
