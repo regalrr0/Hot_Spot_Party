@@ -29,6 +29,7 @@ public class getEvents2 extends AppCompatActivity {
     private Button disBooty;
     private Intent i;
     private TextView usernView;
+    String getString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +40,29 @@ public class getEvents2 extends AppCompatActivity {
 
         i = getIntent();
 
+        HashMap<String,String> map = new HashMap<>();
 
-        usernView.setText(i.getStringExtra("username") + ", ARE YOU READY TO HAVE THE NIGHT OF YOUR LIFE???");
+        if(i.getStringExtra("club") != null) {
+            getString = i.getStringExtra("club");
+            map.put("club",getString);
+        }
+        else if(i.getStringExtra("festival") != null) {
+            getString = i.getStringExtra("festival");
+            map.put("festival",getString);
+        }
+        else if(i.getStringExtra("sport") != null) {
+            getString = i.getStringExtra("sport");
+            map.put("sport",getString);
+        }
+
+        httpUrlConn getEvents = new httpUrlConn(map,"http://hive.sewanee.edu/evansdb0/android/getEvents.php");
+
+        getEvents.execute();
+
+
+
+
+        //usernView.setText(i.getStringExtra("username") + ", ARE YOU READY TO HAVE THE NIGHT OF YOUR LIFE???");
 
 
 
@@ -56,7 +78,7 @@ public class getEvents2 extends AppCompatActivity {
     }
 
 
-    public void showEvents(){
+    public void showEvents() {
         mAuthTask = new httpUrlConn(null, "http://hive.sewanee.edu/evansdb0/android/getEvents.php");
 
         mAuthTask.execute();

@@ -26,6 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".home"
             android:label="home"
@@ -34,18 +35,36 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="theregaltreatment.hotspotparty.loginActivity2" />
         </activity>
-        <activity
-            android:name=".getEvents"
-            android:label="@string/title_activity_get_events"
-            android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".getEvents2"
             android:label="@string/title_activity_get_events2"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" >
+
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="theregaltreatment.hotspotparty.chooseEvent"/>
+        </activity>
+
         <activity
             android:name=".chooseEvent"
             android:label="@string/title_activity_choose_event"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="theregaltreatment.hotspotparty.getEvents2"/>
+        </activity>
+
+        <activity
+            android:name=".displayinginfo"
+            android:label="@string/title_activity_displayinginfo"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="theregaltreatment.hotspotparty.getEvents2"/>
+
+        </activity>
     </application>
 
 </manifest>
