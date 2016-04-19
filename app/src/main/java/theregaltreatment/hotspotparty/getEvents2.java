@@ -33,22 +33,17 @@ public class getEvents2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_events2);
+        setContentView(R.layout.content_get_events2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         i = getIntent();
 
-        usernView = (TextView) findViewById(R.id.userView);
-        usernView.setText(i.getStringExtra("username") + ", ARE YOU READY TO HAVE THE NIGHT OF YOUR LIFE???");
-        disBooty = (Button) findViewById(R.id.disButt);
 
-        disBooty.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            showEvents();
-                                        }
-                                    });
+        usernView.setText(i.getStringExtra("username") + ", ARE YOU READY TO HAVE THE NIGHT OF YOUR LIFE???");
+
+
+
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

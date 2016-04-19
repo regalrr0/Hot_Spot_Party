@@ -207,10 +207,10 @@ TODO: Move this to register area to see if email is a valid email address
 
             try {
                 if(mAuthTask.get().contains("true")) {
-                    String r = mAuthTask.get().replace("true,","");
+                    String r = mAuthTask.get().replace("true // ","");
                     Log.i("response", "dsfdsf means we got dis shit");
                     Toast.makeText(getApplicationContext(),r,Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(this, getEvents2.class);
+                    Intent i = new Intent(this, chooseEvent.class);
                     i.putExtra("username", username);
                     startActivity(i);
 
@@ -296,7 +296,7 @@ TODO: Move this to register area to see if email is a valid email address
                      String r = mAuthTask.get().replace("true,","");
                      Log.i("response", "dsfdsf means we inserted shit");
                      Toast.makeText(getApplicationContext(),r,Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(this, getEvents2.class);
+                    Intent i = new Intent(this,loginActivity2.class);
                     startActivity(i);
 
                  }

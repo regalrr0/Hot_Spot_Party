@@ -41,6 +41,10 @@
         <activity
             android:name=".getEvents2"
             android:label="@string/title_activity_get_events2"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".chooseEvent"
+            android:label="@string/title_activity_choose_event"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
