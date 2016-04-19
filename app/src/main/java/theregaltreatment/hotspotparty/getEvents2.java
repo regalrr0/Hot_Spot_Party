@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +31,9 @@ public class getEvents2 extends AppCompatActivity {
     private Button disBooty;
     private Intent i;
     private TextView usernView;
-    String getString;
+    String getString, response;
+    private ListView listEvents;
+    customList eventListings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,8 @@ public class getEvents2 extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         i = getIntent();
+
+        listEvents = (ListView) findViewById(R.id.listView);
 
         HashMap<String,String> map = new HashMap<>();
 
@@ -55,31 +61,59 @@ public class getEvents2 extends AppCompatActivity {
             map.put("sport",getString);
         }
 
-        httpUrlConn getEvents = new httpUrlConn(map,"http://hive.sewanee.edu/evansdb0/android/getEvents.php");
+        mAuthTask = new httpUrlConn(map,"http://hive.sewanee.edu/evansdb0/android1/scripts/getEvents.php");
 
-        getEvents.execute();
+        mAuthTask.execute();
 
+        try {
+            Log.i("mAuthTask.get is:", mAuthTask.get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(mAuthTask.get().contains("")) {
+                String [] r = mAuthTask.get().split(" /_/ ");
+                Integer[] imageid = {
+                        R.drawable.flamenight,
+                        R.drawable.coolbackground
+                                     };
 
+                eventListings = new customList(this, r, imageid);
 
+                listEvents.setAdapter(eventListings);
 
-        //usernView.setText(i.getStringExtra("username") + ", ARE YOU READY TO HAVE THE NIGHT OF YOUR LIFE???");
+                //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, r);
 
+                //listEvents.setAdapter(arrayAdapter);
 
-
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Log.i("response", "dsfdsf means we inserted shit");
+                for(String j: r) {
+                    //TODO: Create array of strings for array adaptor
+                    Toast.makeText(getApplicationContext(), j, Toast.LENGTH_LONG).show();
+                }
             }
-        });*/
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        if(mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
+            mAuthTask = null;
     }
 
 
+
+
+
+
+        //usernView.setText(i.getStringExtra("username") + ", Welcome! Please select an event you are interested in and let us do the rest!");
+
+
     public void showEvents() {
-        mAuthTask = new httpUrlConn(null, "http://hive.sewanee.edu/evansdb0/android/getEvents.php");
+        mAuthTask = new httpUrlConn(null, "http://hive.sewanee.edu/evansdb0/android1/scripts/getEvents.php");
 
         mAuthTask.execute();
 

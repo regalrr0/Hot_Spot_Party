@@ -201,7 +201,7 @@ TODO: Move this to register area to see if email is a valid email address
             HashMap<String, String> map = new HashMap<>();
             map.put("username", username);
             map.put("pass", password);
-            mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android/hotPartyLogin.php");
+            mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android1/scripts/hotPartyLogin.php");
 
             mAuthTask.execute();
 
@@ -286,7 +286,7 @@ TODO: Move this to register area to see if email is a valid email address
             map.put("sex", gender);
             map.put("cPass", conPass);
 
-            mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android/hotPartySignUp.php");
+            mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android1/scripts/hotPartySignUp.php");
 
             mAuthTask.execute();
             // if php inserted credentials into the database
