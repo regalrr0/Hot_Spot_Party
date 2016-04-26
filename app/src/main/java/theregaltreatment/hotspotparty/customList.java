@@ -5,6 +5,8 @@ package theregaltreatment.hotspotparty;
  */
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +17,9 @@ import android.widget.TextView;
 public class customList extends ArrayAdapter<String>{
     private final Activity context;
     private final String[] web;
-    private Integer[] imageId;
+    private Bitmap [] imageId;
     public customList(Activity context,
-                      String[] web, Integer[] imageId) {
+                      String[] web, Bitmap[] imageId) {
         super(context, R.layout.list_single, web);
         this.context = context;
         this.web = web;
@@ -34,7 +36,7 @@ public class customList extends ArrayAdapter<String>{
         ImageView imageView = (ImageView) rowView.findViewById(R.id.img);
         txtTitle.setText(web[position]);
 
-        imageView.setImageResource(imageId[position]);
+        imageView.setImageBitmap(imageId[position]);
         return rowView;
     }
 }

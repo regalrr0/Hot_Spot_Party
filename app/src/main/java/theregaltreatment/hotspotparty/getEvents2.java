@@ -1,8 +1,13 @@
 package theregaltreatment.hotspotparty;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +22,13 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -46,22 +55,23 @@ public class getEvents2 extends AppCompatActivity {
 
         listEvents = (ListView) findViewById(R.id.listView);
 
-        HashMap<String,String> map = new HashMap<>();
+        HashMap<String, String> map = new HashMap<>();
 
-        if(i.getStringExtra("club") != null) {
+        if (i.getStringExtra("club") != null) {
             getString = i.getStringExtra("club");
-            map.put("club",getString);
-        }
-        else if(i.getStringExtra("festival") != null) {
+            map.put("club", getString);
+        } else if (i.getStringExtra("festival") != null) {
             getString = i.getStringExtra("festival");
-            map.put("festival",getString);
-        }
-        else if(i.getStringExtra("sport") != null) {
+            map.put("festival", getString);
+        } else if (i.getStringExtra("sport") != null) {
             getString = i.getStringExtra("sport");
-            map.put("sport",getString);
+            map.put("sport", getString);
         }
 
-        mAuthTask = new httpUrlConn(map,"http://hive.sewanee.edu/evansdb0/android1/scripts/getEvents.php");
+
+
+
+        mAuthTask = new httpUrlConn(map, "http://hive.sewanee.edu/evansdb0/android1/scripts/getEvents.php");
 
         mAuthTask.execute();
 
@@ -73,23 +83,60 @@ public class getEvents2 extends AppCompatActivity {
             e.printStackTrace();
         }
         try {
-            if(mAuthTask.get().contains("")) {
-                String [] r = mAuthTask.get().split(" /_/ ");
-                Integer[] imageid = {
-                        R.drawable.flamenight,
-                        R.drawable.coolbackground
-                                     };
+            if (mAuthTask.get().contains("")) {
+                int rows;
+                String[] r = mAuthTask.get().split(" /_/ ");
 
-                eventListings = new customList(this, r, imageid);
+                Log.i("length", Integer.valueOf(r.length).toString());
+
+                // num rows from database
+//                rows = Integer.valueOf(r[0]);
+
+               String[] textForList = new String[r.length/2];
+
+                String[] urls = new String[r.length/2];
+
+
+                // to be populate after async task
+
+                Bitmap[] image = new Bitmap[r.length/2];
+
+                Integer [] imageid = new Integer[r.length/2];
+
+                int x = 0;
+                int y=0;
+
+                //trying this
+
+                //Bitmap preview  = BitmapFactory.decodeStream(null, options);
+
+                Drawable d []=  new Drawable[r.length/2];
+                ImageDownloader task[] = new ImageDownloader[r.length/2];
+                for(int j = 0; j < r.length; j+=2 ) {
+
+                    textForList[x] = r[j];
+                    urls[x] = r[j+1];
+                    task[x] = new ImageDownloader();
+                    image [x] = task[x].execute(urls[x]).get();
+                    d[x] = new BitmapDrawable(getResources(), image[x]);
+                    Log.i("TextForList", textForList[x]);
+                    Log.i("URLS", urls[x]);
+                    Log.i("J=", Integer.valueOf(x).toString());
+                    x++;
+
+                }
+
+
+                eventListings = new customList(this, textForList, image);
 
                 listEvents.setAdapter(eventListings);
 
                 //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, r);
 
-                //listEvents.setAdapter(arrayAdapter);
+              //  listEvents.setAdapter(eventListings);
 
-                Log.i("response", "dsfdsf means we inserted shit");
-                for(String j: r) {
+                //Log.i("response", "dsfdsf means we inserted shit");
+                for (String j : r) {
                     //TODO: Create array of strings for array adaptor
                     Toast.makeText(getApplicationContext(), j, Toast.LENGTH_LONG).show();
                 }
@@ -100,16 +147,12 @@ public class getEvents2 extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if(mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
+        if (mAuthTask == null || mAuthTask.getStatus().equals(AsyncTask.Status.FINISHED))
             mAuthTask = null;
     }
 
 
-
-
-
-
-        //usernView.setText(i.getStringExtra("username") + ", Welcome! Please select an event you are interested in and let us do the rest!");
+    //usernView.setText(i.getStringExtra("username") + ", Welcome! Please select an event you are interested in and let us do the rest!");
 
 
     public void showEvents() {
@@ -118,9 +161,9 @@ public class getEvents2 extends AppCompatActivity {
         mAuthTask.execute();
 
         try {
-                String r = mAuthTask.get();
-                Log.i("response", "dsfdsf means we inserted shit");
-                Toast.makeText(getApplicationContext(), r, Toast.LENGTH_LONG).show();
+            String r = mAuthTask.get();
+            Log.i("response", "dsfdsf means we inserted shit");
+            Toast.makeText(getApplicationContext(), r, Toast.LENGTH_LONG).show();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -213,5 +256,35 @@ public class getEvents2 extends AppCompatActivity {
             mAuthTask = null;
         }
 
+    }
+
+
+    public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            try {
+                URL url = new URL(params[0]);
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                conn.connect();
+
+                InputStream iStream = conn.getInputStream();
+                //BitmapFactory.Options options = new BitmapFactory.Options();
+                //options.inSampleSize = 8;
+
+                Bitmap myBitmap = BitmapFactory.decodeStream(iStream);//,null, options);
+
+                return myBitmap;
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
     }
 }
