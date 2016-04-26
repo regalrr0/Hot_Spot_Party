@@ -75,6 +75,9 @@
         <option value="3">Sports</option>
 
       </select><br><br>
+        
+      URL:
+      <input type="text" name="url">
 
 
 
@@ -83,6 +86,9 @@
 
 
 <?php
+  ini_set('display_errors', 1);
+  error_reporting(E_ALL);
+require_once('response.php');
 
     if(isset($_POST['name']) &&
        isset($_POST['description']) &&
@@ -90,40 +96,83 @@
        isset($_POST['year']) &&
        isset($_POST['day']) &&
        isset($_POST['year']) &&
-       isset($_POST['eventType'])) {
+       isset($_POST['eventType']) &&
+       isset($_POST['url'])) {
 
     $con = new mysqli("crisler","user","csci","android");
 
-    $name           = $_POST['name']; 
-    $description    = $_POST['description'];
-    $year           = $_POST['year'];
-    $day            = $_POST['day'];
-    $month          = $_POST['month'];
-    $address        = $_POST['address']; 
-    $sNotes         = $_POST['specialNotes'];
-    echo $eventType      = $_POST['eventType'];
+    $name           = getPost($con,$_POST['name']); 
+    $description    = getPost($con,$_POST['description']);
+    $year           = getPost($con,$_POST['year']);
+    $day            = getPost($con,$_POST['day']);
+    $month          = getPost($con,$_POST['month']);
+    $address        = getPost($con,$_POST['address']); 
+    $sNotes         = getPost($con,$_POST['specialNotes']);
+    echo $imgPath           = getPost($con,$_POST['url']);
+    $eventType      = getPost($con,$_POST['eventType']);
 
 
     $date = $year . '-' . $month . '-' . $day;
 
+    $imgName = explode("/", $imgPath);
+
+    // imgName[6] is the name
+
+    shell_exec("chmod 0777 ../images/". $imgName[6]);
+    $file = createThumbnail("../images/" . $imgName[6]);
     
-    $query = "insert into events(name, description, dateEvent, address, specialNotes, eventTypeId) 
+    
+    $query = "insert into events(name, description, dateEvent, address, specialNotes, imgPath, eventTypeId) 
 
              VALUES('$name'
                    ,'$description'
                    ,'$date'
                    ,'$address'
                    ,'$sNotes'
+                   ,'$imgPath'
                    ,(select eventTypeId from eventType where eventTypeId = '$eventType'))";
     
     $r = $con->query($query);
     if(!$r) die($con->error);
 
-    /*if(isset($_POST['submit']))
+    /*if(isset($_POST['submit']O))O
     header("Location: http://hive.sewanee.edu/evansdb0/android/AddEvent.php"); */
 
-}
+    echo "<img src='$file'>";
 
+}
+function createThumbnail($filename) {
+     
+    if(preg_match('/[.](jpg)$/', $filename)) {
+        $im = imagecreatefromjpeg($filename);
+    } else if (preg_match('/[.](gif)$/', $filename)) {
+        $im = imagecreatefromgif($path_to_image_directory . $filename);
+    } else if (preg_match('/[.](png)$/', $filename)) {
+        $im = imagecreatefrompng($path_to_image_directory . $filename);
+    }
+     
+    $ox = imagesx($im);
+    $oy = imagesy($im);
+     
+    $nx = $final_width_of_image = 50;
+    $ny = floor($oy * ($final_width_of_image / $ox));
+     
+    $nm = imagecreatetruecolor($nx, $ny);
+     
+    imagecopyresized($nm, $im, 0,0,0,0,$nx,$ny,$ox,$oy);
+     
+    /*if(!file_exists($path_to_thumbs_directory)) {
+      if(!mkdir($path_to_thumbs_directory)) {
+           die("There was a problem. Please try again!");
+      } 
+       } */
+    // need to make sure privileges are good on the image saved 
+       // or else imagejpeg fails 
+    imagejpeg($nm, $filename,100);
+    $tn = $filename;
+    
+    return $tn;
+}
 ?>
   </body>
 

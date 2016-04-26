@@ -19,13 +19,21 @@ create table events (
   dateEvent    date, 
   address      varchar(50),
   specialNotes varchar(150),
+  imgPath      varchar(150),
   eventTypeId  int
+
+);
+drop table eventType;
+create table eventType (
+  
+  eventTypeId      int unsigned not null auto_increment primary key,
+  eventType        varchar(30)
 
 );
 
 drop table hours;
 create table hours (
-  hoursId     int unsigned not null auto_increment primary key,
+  hoursId  int unsigned not null auto_increment primary key,
   msHours  int(2), 
   meHours  int(2),
 
@@ -48,3 +56,32 @@ create table hours (
   sueHours  int(2)  
 
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---------------------------INSERTIONS TO THE DATABASE-------------------------------*/
+
+insert into eventType(eventType) VALUE('club');
+insert into eventType(eventType) VALUE('festival');
+insert into eventType(eventType) VALUE('sports');
+
+insert into users(userName,passHash,email,fname,lName,age,gender) 
+
+
+VALUES("yellowman"
+      ,"123456789"
+      ,"yellow@man.com"
+      ,"yellow"
+      ,"man"
+      ,"69"
+      ,"Female")

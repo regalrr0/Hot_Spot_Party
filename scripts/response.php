@@ -20,9 +20,9 @@
         // row is looped through 
         for($i =0; $i<count($rArray); $i++) {
           if($i < count($rArray) -1)
-            $m .= $rArray[$i] . " // ";
+            $m .= $rArray[$i] . " /_/ ";
           else 
-            $m .= $rArray[$i] . " /*/ ";
+            $m .= $rArray[$i] . " /_/ ";
         }
         // this provides line breaks to see output in browser if true
         $lineBreaks ? $m .= "<br><br>":$m .= "";

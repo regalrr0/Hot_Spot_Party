@@ -10,13 +10,15 @@
 
     $club = 1;//$_POST['club'];
     
-    $query = "select name from events
+    $query = "select name,imgPath from events
 
     where eventTypeId='$club'";
 
     $r = myQ($con, $query);
 
-    sendResponse($r,true);
+    //echo $r->num_rows . " /_/ ";
+
+    sendResponse($r);
     
   //}
   
@@ -34,4 +36,17 @@
   // format via sendResponse i.e. comma separated row stuff (possibly 2 dimensional)
   // java get above string and puts it intent 
   // next activity parses nicely for listing 
+
+
+  /*
+    
+    for(int i=1; i < rows; i++) [
+       
+       text = a[i];  // 1
+       i++;
+       image = a[i]  // 2
+
+    ]
+
+  */
 ?>
