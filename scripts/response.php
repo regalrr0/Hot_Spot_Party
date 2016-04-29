@@ -5,7 +5,10 @@
 
   function sendResponse($r,$lineBreaks=false) {
       // turn response into // separated strings
-    if(is_object($r) || $r === null) {
+
+    // this was originally (is_object($r) || $r === null) and it was working 
+    // but that doesn't make any sense so replace with (is_object($r) && !($r === null))
+    if(is_object($r) && !($r === null)) {
       $m = "";
       // loops throug the rows returned from query 
       for($j=0; $j<$r->num_rows; $j++) { 
@@ -27,7 +30,7 @@
         // this provides line breaks to see output in browser if true
         $lineBreaks ? $m .= "<br><br>":$m .= "";
       }
-      // send the //,/// separated string
+      // send the " // " separated string
       echo $m;
     }
     // $r must be null or non-object

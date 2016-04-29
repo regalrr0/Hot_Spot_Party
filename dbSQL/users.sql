@@ -19,7 +19,8 @@ create table events (
   dateEvent    date, 
   address      varchar(50),
   specialNotes varchar(150),
-  imgPath      varchar(150),
+  smallImgPath      varchar(150),
+  largeImgPath      varchar(150),
   eventTypeId  int
 
 );

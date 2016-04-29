@@ -48,15 +48,15 @@
       // check length of first name
     } elseif (strlen($fName)==0 || strlen($fName) > 20) {
         $messages.="The first name field is either empty or too long ". strlen($fname);
+        
       // check length of last name 
     } elseif (strlen($lName)==0 || strlen($lName) > 20) {
         $messages.= "The last name field is either empty or too long ". strlen($lName);
-        
       // check length of career
     } elseif (empty($age)) {
        $messages.= "The age field is empty";
-    } elseif ($age > 100) {
-       $messages.= "You're too old bitch. Sorry";
+    } elseif ($age > 45 || $age < 18) {
+       $messages.= "You can't be " . $age . " this old";
     }
 
     else {   

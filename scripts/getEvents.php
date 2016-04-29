@@ -6,7 +6,7 @@
   $con = new mysqli("crisler","user","csci","android");
 
 
-  //if(isset($_POST['club'])) {
+  if(isset($_POST['club'])) {
 
     $club = 1;//$_POST['club'];
     
@@ -14,39 +14,41 @@
 
     where eventTypeId='$club'";
 
-    $r = myQ($con, $query);
+    $r = myQ($con, $query);    // myQ in response.php
 
     //echo $r->num_rows . " /_/ ";
 
     sendResponse($r);
     
-  //}
-  
-  /*$time = microtime(true);
-  $iters = 500000;
-  for($i =0; $i<$iters; $i++) { 
-
-    sendResponse($r,true);
   }
-  $end = microtime(true);
-  echo "<br><br>time is " . ($end - $time) . " for " . $iters . " iterations"; */
+  elseif(isset($_POST['festival'])) {
 
-  // get button pressed say club 
-  // get club data from db
-  // format via sendResponse i.e. comma separated row stuff (possibly 2 dimensional)
-  // java get above string and puts it intent 
-  // next activity parses nicely for listing 
-
-
-  /*
+    $festival = 2;//$_POST['club'];
     
-    for(int i=1; i < rows; i++) [
-       
-       text = a[i];  // 1
-       i++;
-       image = a[i]  // 2
+    $query = "select name,imgPath from events
 
-    ]
+    where eventTypeId='$festival'";
 
-  */
+    $r = myQ($con, $query);         // myQ in response.php
+
+    //echo $r->num_rows . " /_/ ";
+
+    sendResponse($r);
+    
+  }
+  elseif(isset($_POST['sport'])) {
+
+    $sport = 1;//$_POST['club'];
+    
+    $query = "select name,imgPath from events
+
+    where eventTypeId='$sports'";
+
+    $r = myQ($con, $query);          // myQ in response.php
+
+    //echo $r->num_rows . " /_/ ";
+
+    sendResponse($r);
+    
+  }
 ?>

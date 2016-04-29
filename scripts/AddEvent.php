@@ -3,19 +3,19 @@
   </head>
 
   <body>
-      <form action="AddEvent.php" method="post">
+      <form id="myform" action="AddEvent.php" method="post">
       Name:<br>
 
-  	  <input type="text" name="name" size="100"><br><br>
+  	  <input type="text" name="name" size="100" value="hello"><br><br>
   	  Description:
-  	  <input type="text" name="description" size="175"><br><br>
+  	  <input type="text" name="description" size="175" value="hello"><br><br>
 
   	  address:<br>
 
-  	  <input type="text" name="address" size="100"><br><br>
+  	  <input type="text" name="address" size="100" value="hello"><br><br>
   	  specialNotes:<br>
 
-  	  <input type="text" name="specialNotes" size="100"><br><br>
+  	  <input type="text" name="specialNotes" size="100" value="hello"><br><br>
   	    	  dateOfEvent:<br>
 
   	  <input type="text" name="year" value="2016">
@@ -77,7 +77,9 @@
       </select><br><br>
         
       URL:
-      <input type="text" name="url">
+      <input type="text" name="url"
+
+      value="https://images6.alphacoders.com/316/316963.jpg">
 
 
 
@@ -86,19 +88,20 @@
 
 
 <?php
+
   ini_set('display_errors', 1);
   error_reporting(E_ALL);
 require_once('response.php');
 
-    if(isset($_POST['name']) &&
+   if(isset($_POST['name']) &&
        isset($_POST['description']) &&
        isset($_POST['address']) &&
        isset($_POST['year']) &&
        isset($_POST['day']) &&
        isset($_POST['year']) &&
        isset($_POST['eventType']) &&
-       isset($_POST['url'])) {
-
+       isset($_POST['url'])) { 
+ 
     $con = new mysqli("crisler","user","csci","android");
 
     $name           = getPost($con,$_POST['name']); 
@@ -107,29 +110,43 @@ require_once('response.php');
     $day            = getPost($con,$_POST['day']);
     $month          = getPost($con,$_POST['month']);
     $address        = getPost($con,$_POST['address']); 
-    $sNotes         = getPost($con,$_POST['specialNotes']);
-    echo $imgPath           = getPost($con,$_POST['url']);
+    $sNotes         = getPost($con,$_POST['specialNotes']); 
+
+
+
+    // this is a remote url that links to an image 
+    $imgPath = getPost($con,$_POST['url']);
     $eventType      = getPost($con,$_POST['eventType']);
-
-
     $date = $year . '-' . $month . '-' . $day;
-
-    $imgName = explode("/", $imgPath);
-
-    // imgName[6] is the name
-
-    shell_exec("chmod 0777 ../images/". $imgName[6]);
-    $file = createThumbnail("../images/" . $imgName[6]);
     
+    // writes two files: one that will be the big image 
+    // and one that will be the small image 
+    // the image specified in $imgPath
+    $image = writeImgFileFromURL($imgPath,'w+');
     
-    $query = "insert into events(name, description, dateEvent, address, specialNotes, imgPath, eventTypeId) 
+    // create the small and large image 
+    $small = createThumbnail("../images/small_" 
+    . $image,50); // new image width of 50
+
+    $large = createThumbnail("../images/large_" 
+    . $image,200);
+
+// create the url where the image is found on the server 
+$smallImgUrl = "http://hive.sewanee.edu/evansdb0" .
+"/android1/images/small_" . $image;
+$largeImgUrl = "http://hive.sewanee.edu/evansdb0" .
+"/android1/images/large_" . $image;
+    
+// save that url in the database 
+$query = "insert into events(name, description, dateEvent, address, specialNotes, smallImgPath, largeImgPath, eventTypeId) 
 
              VALUES('$name'
                    ,'$description'
                    ,'$date'
                    ,'$address'
                    ,'$sNotes'
-                   ,'$imgPath'
+                   ,'$smallImgUrl'
+                   ,'$largeImgUrl'
                    ,(select eventTypeId from eventType where eventTypeId = '$eventType'))";
     
     $r = $con->query($query);
@@ -138,10 +155,11 @@ require_once('response.php');
     /*if(isset($_POST['submit']O))O
     header("Location: http://hive.sewanee.edu/evansdb0/android/AddEvent.php"); */
 
-    echo "<img src='$file'>";
+    echo "<br><br><img src='$small'>";
+    echo "<br><br><img src='$large'>";
 
 }
-function createThumbnail($filename) {
+function createThumbnail($filename,$width) {
      
     if(preg_match('/[.](jpg)$/', $filename)) {
         $im = imagecreatefromjpeg($filename);
@@ -154,7 +172,7 @@ function createThumbnail($filename) {
     $ox = imagesx($im);
     $oy = imagesy($im);
      
-    $nx = $final_width_of_image = 50;
+    $nx = $final_width_of_image = $width;
     $ny = floor($oy * ($final_width_of_image / $ox));
      
     $nm = imagecreatetruecolor($nx, $ny);
@@ -172,6 +190,35 @@ function createThumbnail($filename) {
     $tn = $filename;
     
     return $tn;
+}
+function writeImgFileFromURL($imgURL,$access) {
+   
+   // get the URL components as an array
+   $url_array = explode("/", $imgURL);
+
+   $image = end($url_array);
+
+   // write file for small image using the last 
+   // element in the $url_array
+   $handle = 
+   fopen("../images/small_" . $image, $access);
+   fwrite($handle, file_get_contents($imgURL));
+   fclose($handle);
+
+   // same as above but for a large file 
+   $handle = 
+   fopen("../images/large_" . $image, $access);
+   fwrite($handle, file_get_contents($imgURL));
+   fclose($handle);
+
+   // very bad, but not root user so can make this more 
+   // secure right now. Allows us to write to the files 
+   // just created 
+   shell_exec("chmod 0777 ../images/small_". $image);
+   shell_exec("chmod 0777 ../images/large_". $image);
+   
+   // return the name of the file written to 
+   return $image;
 }
 ?>
   </body>
