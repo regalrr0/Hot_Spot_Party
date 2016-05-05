@@ -6,16 +6,16 @@
       <form id="myform" action="addEvent.php" method="post">
       Name:<br>
 
-  	  <input type="text" name="name" size="100" value="hello"><br><br>
+  	  <input type="text" name="name" size="100" value="name"><br><br>
   	  Description:
-  	  <input type="text" name="description" size="175" value="hello"><br><br>
+  	  <input type="text" name="description" size="175" value="description"><br><br>
 
   	  address:<br>
 
-  	  <input type="text" name="address" size="100" value="hello"><br><br>
+  	  <input type="text" name="address" size="100" value="address"><br><br>
   	  specialNotes:<br>
 
-  	  <input type="text" name="specialNotes" size="100" value="hello"><br><br>
+  	  <input type="text" name="specialNotes" size="100" value="specialNotes"><br><br>
   	    	  dateOfEvent:<br>
 
   	  <input type="text" name="year" value="2016">

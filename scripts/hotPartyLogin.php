@@ -2,9 +2,10 @@
 
 
   require_once('response.php');
+  require_once('dbLogin.php');
   
-  $con = new mysqli("crisler","user","csci","android");
 
+  $con = new mysqli($host,$u,$p,$db);
   $m = "";
   
   if(isset($_POST['username']) && isset($_POST['pass'])) {
@@ -16,15 +17,18 @@
     $r = myQ($con,$query);
     
     $rObject = $r->fetch_object();
+    
+    //echo $rObject->userName;
 
     if(($rObject->userName == $userName) && ($pass == $rObject->passHash)) {
-      $m .= "true";
-      $m .= "Login successful";	
+      $m .= "true // login successful";	
+
     }
     else {
       $m .= "Your username or password is wrong";
     } 
-    sendResponse($m);
+    echo $m;
+    //sendResponse($m);
   }
 
 

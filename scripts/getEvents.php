@@ -2,36 +2,33 @@
   
   require_once('response.php');
   
+  require_once('dbLogin.php');
 
-  $con = new mysqli("crisler","user","csci","android");
+  $con = new mysqli($host,$u,$p,$db);
 
 
-  if(isset($_POST['club'])) {
+  //if(isset($_POST['club'])) {
 
     $club = 1;//$_POST['club'];
     
-    $query = "select name,imgPath from events
+    $query = "select name,smallImgPath,eventId from events
 
     where eventTypeId='$club'";
 
     $r = myQ($con, $query);    // myQ in response.php
 
-    //echo $r->num_rows . " /_/ ";
-
     sendResponse($r);
     
-  }
-  elseif(isset($_POST['festival'])) {
+  //}
+  if(isset($_POST['festival'])) {
 
     $festival = 2;//$_POST['club'];
     
-    $query = "select name,imgPath from events
+    $query = "select name,smallImgPath,eventId from events
 
     where eventTypeId='$festival'";
 
     $r = myQ($con, $query);         // myQ in response.php
-
-    //echo $r->num_rows . " /_/ ";
 
     sendResponse($r);
     
@@ -40,13 +37,11 @@
 
     $sport = 1;//$_POST['club'];
     
-    $query = "select name,imgPath from events
+    $query = "select name,smallImgPath,eventId from events
 
-    where eventTypeId='$sports'";
+    where eventTypeId='$sport'";
 
     $r = myQ($con, $query);          // myQ in response.php
-
-    //echo $r->num_rows . " /_/ ";
 
     sendResponse($r);
     

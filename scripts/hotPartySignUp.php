@@ -1,11 +1,12 @@
 <?php 
-
+  require_once('dbLogin.php');
   require_once('response.php');
 
   $messages = "";
-  $con = new mysqli("crisler","user","csci","android");
+
+  $con = new mysqli($host,$u,$p,$db);
   
-  // make sure that every field has a value
+  // make sure that every field has a value 
   if(isset($_POST['userName']) &&
      isset($_POST['pass']) &&
      isset($_POST['age']) &&
