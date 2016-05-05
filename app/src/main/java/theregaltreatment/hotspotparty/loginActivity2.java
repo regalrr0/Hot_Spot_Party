@@ -1,31 +1,27 @@
 package theregaltreatment.hotspotparty;
 
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.TextView;
-
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.text.TextUtils;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -169,13 +165,6 @@ public class loginActivity2 extends AppCompatActivity implements LoaderCallbacks
 
         boolean cancel = false;
         View focusView = null;
-
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
 /*
 TODO: Move this to register area to see if email is a valid email address
        // Check for a valid email address.
@@ -208,8 +197,8 @@ TODO: Move this to register area to see if email is a valid email address
             try {
                 if(mAuthTask.get().contains("true")) {
                     String r = mAuthTask.get().replace("true // ","");
-                    Log.i("response", "dsfdsf means we got dis shit");
-                    Toast.makeText(getApplicationContext(),r,Toast.LENGTH_LONG).show();
+                    Log.i("response", r.toString());
+                    Toast.makeText(getApplicationContext(),r,Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(this, chooseEvent.class);
                     i.putExtra("username", username);
                     startActivity(i);
@@ -217,8 +206,8 @@ TODO: Move this to register area to see if email is a valid email address
                 }
                 else {
                     String[] resp = response.split(",");
-                    for(String i: resp)
-                        Toast.makeText(getApplicationContext(),i,Toast.LENGTH_LONG).show();
+                   // for(String i: resp)
+                        //Toast.makeText(getApplicationContext(),i,Toast.LENGTH_SHORT).show();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -261,13 +250,6 @@ TODO: Move this to register area to see if email is a valid email address
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -292,22 +274,22 @@ TODO: Move this to register area to see if email is a valid email address
             // if php inserted credentials into the database
             Log.i("mAuthTask.get is:", mAuthTask.get());
             try {
+                // if the user succesfully logged in
                 if(mAuthTask.get().contains("true")) {
-                     String r = mAuthTask.get().replace("true,","");
-                     Log.i("response", "dsfdsf means we inserted shit");
-                     Toast.makeText(getApplicationContext(),r,Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(this,loginActivity2.class);
-                    startActivity(i);
+                     String r = mAuthTask.get().replace("true // ","");
+                     // tell them they are registered
+                     Toast.makeText(getApplicationContext(),r,Toast.LENGTH_SHORT).show();
+                     Intent i = new Intent(this,loginActivity2.class);
+                     // take them back to log in part of this activity
+                     startActivity(i);
 
                  }
                  else {
                      String[] resp = response.split(",");
                      for(String i: resp)
-                         Toast.makeText(getApplicationContext(),i,Toast.LENGTH_LONG).show();
+                         Toast.makeText(getApplicationContext(),i,Toast.LENGTH_SHORT).show();
                  }
             } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
                 e.printStackTrace();
             }
 
@@ -340,33 +322,12 @@ TODO: Move this to register area to see if email is a valid email address
             mEmailSignInButton.setVisibility(View.VISIBLE);
             registering = false;
         }
-        //registerButton.setVisibility(View.INVISIBLE);
     }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 0;
-    }
-
-
-    /** Begin class
-     * The start for the class that will handle our user input
-     */
-    //------------------------------------------------------------------------------------------
-
     public class httpUrlConn extends AsyncTask<Void, Void, String> {
 
         private HashMap<String,String> map = null;
         private String url;
         private final String USER_AGENT = "Mozilla/5.0";
-
-        public httpUrlConn() {
-        }
 
         public httpUrlConn(HashMap<String,String> _map, String _url) {
             map = _map;
@@ -385,8 +346,6 @@ TODO: Move this to register area to see if email is a valid email address
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
             String params ="";
-
-            // key=value&key=value
 
             // make the url params that will be sent
             Iterator it = map.entrySet().iterator();
@@ -444,19 +403,6 @@ TODO: Move this to register area to see if email is a valid email address
             mAuthTask = null;
         }
     }
-
-
-
-
-
-
-
-
-    //-------------------------------------------------------------------------------------------
-
-
-    /** Begin class to store user credentials in phone
-     */
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {

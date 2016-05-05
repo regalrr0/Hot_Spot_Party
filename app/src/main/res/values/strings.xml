@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Hot Spot Party</string>
+    <string name="app_name">Hot Party Spot</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -13,6 +13,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="displayImageInfo">Image of event</string>
     <string-array name="gender_array">
         <item>Male</item>
         <item>Female</item>

@@ -32,7 +32,8 @@
         android:ems="10"
         android:id="@+id/username"
         android:hint="Username"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:text="yellowman"/>
 
     <EditText
         android:id="@+id/password"
@@ -44,7 +45,8 @@
         android:imeOptions="actionUnspecified"
         android:inputType="textPassword"
         android:maxLines="1"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:text="123456789"/>
 
     <EditText
         android:layout_width="match_parent"
